@@ -1,0 +1,119 @@
+For the requirement of this project we will use the data from the folder  "UCI HAR Dataset" which is available in  https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip 
+This data is about a nice experiment that was made it for  Non Linear Complex Systems Laboratory, this peole is in Università degli Studi di Genova. The experiment is about take 30 guys between 19-48 years and then they did six activities  (WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS, SITTING, STANDING, LAYING) using a smartphone (Samsung Galaxy S II) on the waist. This smartphone has gadgets that  measure a lot of thing for example the position in the space tridimensional (XYZ) of the person who is using the smartphone, when a person crouches the smartphone measure the angle between the positions of the person's head before crouches and after crouches.
+You can google "gyroscope on smartphone" to see nice pictures that show this concept.
+
+The files in the folder "UCI HARDataset" which contains the register of the features measured in the experiment (there are a lot, 561 features, and there are listed in the file "features.txt")  are normalized and bounded within [-1,1].
+
+How the point 2 of the project only say: "Extracts only the measurements on the mean and standard deviation for each measurement. "
+I decided choice the following features:
+
+1 tBodyAcc-mean()-X
+2 tBodyAcc-mean()-Y
+3 tBodyAcc-mean()-Z
+4 tBodyAcc-std()-X
+5 tBodyAcc-std()-Y
+6 tBodyAcc-std()-Z
+121 tBodyGyro-mean()-X
+122 tBodyGyro-mean()-Y
+123 tBodyGyro-mean()-Z
+124 tBodyGyro-std()-X
+125 tBodyGyro-std()-Y
+126 tBodyGyro-std()-Z
+
+
+Because they have the the word "mean" and "std" within and I consider that they are the features most easy to understand.
+
+To understand the variables Imagine the following:
+The person with the smartphone is a point in the space this point makes six activities.
+Which activity is made in a interval of time. In this interval the smartphone makes measures
+the first three features:
+
+1 tBodyAcc-mean()-X
+2 tBodyAcc-mean()-Y
+3 tBodyAcc-mean()-Z
+
+are the components of the position vector of the person if we take the mean of all the measures that the smartphone made in the interval of time
+
+the features:
+
+4 tBodyAcc-std()-X
+5 tBodyAcc-std()-Y
+6 tBodyAcc-std()-Z
+
+are the standard deviation of this distance.
+
+Analogously the variables:
+121 tBodyGyro-mean()-X
+122 tBodyGyro-mean()-Y
+123 tBodyGyro-mean()-Z
+124 tBodyGyro-std()-X
+125 tBodyGyro-std()-Y
+126 tBodyGyro-std()-Z
+
+measure the angle instead of the position relative to each component X,Y and Z.
+
+The columns:
+1 tBodyAcc-mean()-X
+2 tBodyAcc-mean()-Y
+3 tBodyAcc-mean()-Z
+4 tBodyAcc-std()-X
+5 tBodyAcc-std()-Y
+6 tBodyAcc-std()-Z
+121 tBodyGyro-mean()-X
+122 tBodyGyro-mean()-Y
+123 tBodyGyro-mean()-Z
+124 tBodyGyro-std()-X
+125 tBodyGyro-std()-Y
+126 tBodyGyro-std()-Z
+ 
+ are of type continuos
+
+In the script run_analysis.R we used the function "select" of the packages "dply" and we select the columns V1,V4,V2,V5,V3,V6,V121,V124,V122,V125,V123,V126. Note that this labels are the same that the order of the variables in the file features.txt.
+
+The script's output is a file named "PrintTidyData.txt" which contains a dataframe with the following variables:
+
+ Activity 
+    Variable of type categorial: Contains the name of the activity that the person made.
+    WALKING
+    WALKING_UPSTAIRS
+    WALKING_DOWNSTAIRS
+    SITTING
+    STANDING
+    LAYING
+    
+Person
+    Variable of type categorical: Contains the id of the activity that the person was in the experiment. 
+    1,2,3,...,30
+ 
+ Average_Mean_Acc_X 
+    Variable of type continuos: Contains the average overall of the mean acceleration in the component X for one person in one activity.
+ Average_STD_Acc_X
+    Variable of type continuos: Contains the average overall of the std acceleration in the component X for one person in one activity.
+
+ Average_Mean_Acc_Y
+    Variable of type continuos: Contains the average overall of the mean acceleration in the component Y for one person in one activity.
+ Average_STD_Acc_Y  
+    Variable of type continuos: Contains the average overall of the std acceleration in the component Y for one person in one activity.
+    
+ Average_Mean_Acc_Z 
+    Variable of type continuos: Contains the average overall of the mean acceleration in the component Z for one person in one activity.
+ Average_STD_Acc_Z  
+    Variable of type continuos: Contains the average overall of the std acceleration in the component Z for one person in one activity.
+
+ Average_Mean_Gyro_X
+    Variable of type continuos: Contains the average overall of the mean gyro in the component X for one person in one activity.
+
+ Average_STD_Gyro_X
+     Variable of type continuos: Contains the average overall of the std gyro in the component X for one person in one activity.
+
+ Average_Mean_Gyro_Y
+     Variable of type continuos: Contains the average overall of the mean gyro in the component Y for one person in one activity.
+
+ Average_STD_Gyro_Y
+         Variable of type continuos: Contains the average overall of the std gyro in the component Y for one person in one activity.
+ 
+ Average_Mean_Gyro_Z
+     Variable of type continuos: Contains the average overall of the mean gyro in the component Z for one person in one activity.
+ 
+ Average_STD_Gyro_Z
+     Variable of type continuos: Contains the average overall of the std gyro in the component Z for one person in one activity.
