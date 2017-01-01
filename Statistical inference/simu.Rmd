@@ -2,9 +2,10 @@
 title: "Simulation Exercise (Exponential distribution)"
 author: "José Antonio García Ramirez"
 date: "December 31, 2016"
-output: html_document
-<--!  md_document:
-    variant: markdown_github-->
+output: 
+  md_document:
+  variant: markdown_github
+  
 ---
 
 ```{r setup, include=FALSE}
