@@ -1,0 +1,116 @@
+---
+title: "Simulation Exercise (Exponential distribution)"
+author: "José Antonio García Ramirez"
+date: "December 31, 2016"
+output: html_document
+<--!  md_document:
+    variant: markdown_github-->
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE, warning = FALSE )
+library(ggplot2)
+library(dplyr)
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+ # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  numPlots = length(plots)
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+ if (numPlots==1) {
+    print(plots[[1]])
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+```
+
+## Introduction: Exponential distribution
+
+The density function of exponential distribution is given by:
+
+$$ f(x) = \lambda e^{-\lambda x}, \forall \lambda \ge 0$$
+
+And it's cumulative distribution function is:
+
+$$ \int_{\lambda \ge 0} \lambda e^{-\lambda x} = 1 -e\lambda x $$
+
+And this distribution has many applications in the survival analysis, such as lifetimes and even in industrial statistics (including software development) [1](https://en.wikipedia.org/wiki/Survival_analysis)
+
+
+## Sample mean and variance
+
+Let's first simulate a thousand random variables $x \sim Exp(\lambda = 0.2)$, let's to fix the seed for reproducibility. 
+
+
+```{r }
+set.seed(176325)
+simula <- rexp(1000,0.2)
+simula <- as.data.frame(simula)
+sampleMean <- mean(simula$simula)
+sampleVar <- var(simula$simula)
+g1 <- ggplot(simula, aes(simula)) + geom_histogram(aes(y = ..count../sum(..count..)),
+                                                      fill = 'deepskyblue2') +
+    ggtitle("Simulation Exp(lambda=0.2)") + ylab('')+ xlab('') +theme_bw() + 
+stat_function(fun = dexp, colour = "springgreen", args = 0.2) + 
+	geom_vline( xintercept = sampleMean, color = 'violetred') +
+	geom_vline( xintercept = 1/0.2, color = "red")  
+g2 <- ggplot(simula, aes(simula)) + geom_histogram(aes(y = ..count../sum(..count..)),
+                                                      fill = 'deepskyblue2') +
+    ggtitle("Simulation Exp(lambda=0.2)") + ylab('')+ xlab('') +theme_bw() + 
+stat_function(fun = dexp, colour = "springgreen", args = 0.2) + 
+	geom_vline( xintercept = sampleMean, color = 'violetred') +
+	geom_vline( xintercept = 1/0.2, color = "red") + xlim(c(3.5,7.5)) 
+multiplot(g1,g2, cols = 2)
+
+```
+
+Figure 1: (Right) Distribution of the simulated sample. (Left) Zoom on the sample mean, in color violet and theoretical mean ( $\frac{1}{\lambda}=5$ ) in color red.
+
+
+As we can see in figure 1, the sample mean of the thousand simulations is very close to the theoretical average `r sampleMean` as well as the sample variance `r sampleVar` Which, for this distribution, coincide and are $\frac{1}{\lambda}=5$ and $(\frac{1}{\lambda})^{2}=25$ respectively.
+
+## Central limit theorem
+
+Let's check the CLT by simulating a thousand averages of 40 random variables $x \sim Exp(0.2)$
+
+```{r }
+set.seed(176325)
+simula <- function(lambda)
+{
+	sim <- rexp(40,0.2)
+	return(c(mean(sim), var(sim)))
+}
+simulation <- mapply(simula,rep(0.2,1000))
+simulation <- as.data.frame(t(simulation))
+names(simulation) <- c("means", "var")
+means <- mean(simulation$means)
+vars <- var(simulation$means)
+lambda <- .2
+#simulation <- simulation %>% mutate( score = (means-beta) / ( beta /sqrt(40)))
+ggplot(simulation, aes(means)) + geom_density(aes(colour = 'Simulation') )+
+    ggtitle("Simulation average 40 Exp(lambda=0.2)") + ylab('')+ xlab('')  + 
+stat_function(fun = dnorm, colour = "springgreen", args =  c(1/lambda, 1/lambda/sqrt(40))) +
+theme_bw()+theme(legend.title=element_blank())
+```
+
+Figure 2: Distribution of a thousand averages $Exp (0.2)$
+
+The average of the simulation is of `r means` while its standard deviation is of `r vars` so we can see in the figure 2 the simulated sample approaches well to a distribution $N (\frac{1}{\lambda}=5, \frac{ \frac{1} {\lambda}}{\sqrt {40}}=0.7905694$ ( figure 2 green).
+
