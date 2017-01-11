@@ -1,30 +1,71 @@
 ---
-title: "cars"
+title: 'Motor trend: automatic or manual transmission?'
 author: "José Antonio García Ramirez"
 date: "January 10, 2017"
 output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+library(knitr)
+library(dplyr)
 ```
 
-## R Markdown
+## Summary
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r cars}
-summary(cars)
+cars <- mtcars
+cars <- transform(cars, cyl = factor(cyl), am = factor(am)  )
 ```
 
-## Including Plots
+## Data
 
-You can also embed plots, for example:
+Data from 32 cars of the 1973 and 1974 models have been collected and stored in a package of R [1], and the following variables are recorded:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+* _mpg_      Miles/(US) gallon  
+* _cyl_      Number of cylinders  
+* _disp_     Displacement 
+* _hp_       Gross horsepower
+* _drat_     Rear axie ratio
+* _wt_       Weight (1000 lbs) 
+* _qsec_     1/4 mile time
+* _vs_       V/S
+* _am_       Transmission (0 = automatic, 1 = manual)  
+* _gear_     Number of forward gears
+* _carb_     Number of carburetors 
+
+[1]:http://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html
+
+Table 1 shows the descriptive statistics of the variables, after coding some of the variables as categorical. In particular, we are interested in the relation of the performance by gasoline, since in fact this in Mexico has just had a considerable increase [2], which is reflected in the variable mpg with respect to the type of transmission of the cars.
+
+[2]:
+
+For this reason, we performed a Student t test (since we know neither the variance nor the population mean) with the following hypothesis:
+
+  * $H_0$  The performance of automobiles (mpg) with automatic transmission is on average equal to the average performance of cars with manual transmission
+
+```{r }
+student.test <- t.test(subset(cars, am == 0 )$mpg, subset(cars, am == 1 )$mpg)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+So, with a confidence of 95% we reject the previous hypothesis, since the $ p - $ - value of the test is less than 0.05, in fact it is `r student.test$p.value ` and the means are `r student.test$estimate` for the groups 
+  automatic and manual respectively, so we proceed to fit a multiple regression model which relates mpg to the other features. 
+
+
+Although nine other features are available as possible regressors some of them have high correlation between them and natural relations 
+
+**relaciones naturales como por ejemplo _____citar ejemplos de dependencia entre variables______ proporcionan evidencia para no considderar a las variables: XXX  dentro del estudio 
+como puede verse en la figura 1**
+
+
+```{r }
+
+```
+
+## Adjuncts
+```{r pressure}
+kable(summary(cars))
+```
+
+Table 1: Descriptive statistics of the variables. Note 
