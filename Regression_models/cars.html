@@ -120,7 +120,7 @@ $(document).ready(function () {
 
 <div id="summary" class="section level2">
 <h2>Summary</h2>
-<p>With the data available from our Motor Trend magazine, the question of whether the performance of cars is improved by using manual or automatic transmission is assessed. First, a test of means is evaluated, indicating that the difference is notorious, then a generalized linear model is used, showing again the difference between the use of transmissions and the effect of the choice against the performance of miles per gallon</p>
+<p>With the data available from our Motor Trend magazine, the question of whether the performance of cars is improved by using manual or automatic transmission is assessed. First, a test of means is evaluated, indicating that the difference is non notorious, then a generalized linear model is used, showing again the difference between the use of transmissions and the effect of the choice against the performance of miles per gallon</p>
 </div>
 <div id="data" class="section level2">
 <h2>Data</h2>
@@ -153,7 +153,7 @@ cars &lt;- transform(cars, cyl = factor(cyl), am = factor(am)  )</code></pre>
 </ul>
 <!-- -->
 <pre><code>student.test &lt;- t.test(subset(cars, am == 0 )$mpg, subset(cars, am == 1 )$mpg)</code></pre>
-<p>So, with a confidence of 95% we reject the previous hypothesis, since the <em>p-</em> value of the test is less than 0.05, in fact it is 0.0013736 and the means are 17.1473684, 24.3923077 for the groups automatic and manual respectively, so we proceed to fit a multiple regression model which relates mpg to the other features.</p>
+<p>So, with a confidence of 95% we <strong>non reject</strong> the previous hypothesis, since the <em>p-</em> value of the test is less than 0.05, in fact it is 0.0013736 and the means are 17.1473684, 24.3923077 for the groups automatic and manual respectively, so we proceed to fit a multiple regression model which relates mpg to the other features.</p>
 <p>In view of the fact that automobiles have a higher performance of miles per gallon of gasoline, <em>mpg</em> , when they have the manual transmission, we will try to predict performance depending on the other variables for which information is available.</p>
 <p>As the variable <em>mpg</em> has a high linear correlation with the other variables, as can be seen in figure 2, a first proposed multiple linear model contemplates all variables, considering <em>cyl</em> and <em>am</em> as categorical, The confidence intervals for each of the parameters (in this saturated model) are as follows:</p>
 <pre><code>model.Saturate &lt;- lm(mpg ~ ., data = cars)

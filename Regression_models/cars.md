@@ -4,8 +4,8 @@ Summary
 With the data available from our Motor Trend magazine, the question of
 whether the performance of cars is improved by using manual or automatic
 transmission is assessed. First, a test of means is evaluated,
-indicating that the difference is notorious, then a generalized linear
-model is used, showing again the difference between the use of
+indicating that the difference is non notorious, then a generalized
+linear model is used, showing again the difference between the use of
 transmissions and the effect of the choice against the performance of
 miles per gallon
 
@@ -54,11 +54,11 @@ the variance nor the population mean) with the following hypothesis:
 
     student.test <- t.test(subset(cars, am == 0 )$mpg, subset(cars, am == 1 )$mpg)
 
-So, with a confidence of 95% we reject the previous hypothesis, since
-the *p-* value of the test is less than 0.05, in fact it is 0.0013736
-and the means are 17.1473684, 24.3923077 for the groups automatic and
-manual respectively, so we proceed to fit a multiple regression model
-which relates mpg to the other features.
+So, with a confidence of 95% we **non reject** the previous hypothesis,
+since the *p-* value of the test is less than 0.05, in fact it is
+0.0013736 and the means are 17.1473684, 24.3923077 for the groups
+automatic and manual respectively, so we proceed to fit a multiple
+regression model which relates mpg to the other features.
 
 In view of the fact that automobiles have a higher performance of miles
 per gallon of gasoline, *mpg* , when they have the manual transmission,
