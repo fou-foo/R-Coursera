@@ -2,26 +2,52 @@
 title: 'Motor trend: automatic or manual transmission?'
 author: "José Antonio García Ramirez"
 date: "January 10, 2017"
-output: pdf_document
+output:  
+  md_document:
+  variant: markdown_github
+
+
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE )
 library(knitr)
 library(dplyr)
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL)
+	{
+	library(grid)
+	plots <- c(list(...), plotlist)
+	numPlots = length(plots)
+	  if (is.null(layout)) {
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  	}
+	if (numPlots==1) {
+    print(plots[[1]])
+
+  	} else {
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
 ```
 
 ## Summary
 
+With the data available from our Motor Trend magazine, the question of whether the performance of cars is improved by using manual or automatic transmission is assessed. First, a test of means is evaluated, indicating that the difference is notorious, then a generalized linear model is used, showing again the difference between the use of transmissions and the effect of the choice against the performance of miles per gallon
 
-```{r cars}
-cars <- mtcars
-cars <- transform(cars, cyl = factor(cyl), am = factor(am)  )
-```
 
 ## Data
 
-Data from 32 cars of the 1973 and 1974 models have been collected and stored in a package of R [1], and the following variables are recorded:
+Data from 32 cars of the models 1973 and 1974 have been collected and stored in a package of R [1], and the following variables are recorded:
 
 * _mpg_      Miles/(US) gallon  
 * _cyl_      Number of cylinders  
@@ -39,7 +65,16 @@ Data from 32 cars of the 1973 and 1974 models have been collected and stored in 
 
 Table 1 shows the descriptive statistics of the variables, after coding some of the variables as categorical. In particular, we are interested in the relation of the performance by gasoline, since in fact this in Mexico has just had a considerable increase [2], which is reflected in the variable mpg with respect to the type of transmission of the cars.
 
-[2]:
+```{r cars}
+cars <- mtcars
+cars <- transform(cars, cyl = factor(cyl), am = factor(am)  )
+```
+
+
+[2]:http://edition.cnn.com/2017/01/05/americas/mexico-protests-gas-price-hikes/
+
+
+## Introduction
 
 For this reason, we performed a Student t test (since we know neither the variance nor the population mean) with the following hypothesis:
 
@@ -49,19 +84,45 @@ For this reason, we performed a Student t test (since we know neither the varian
 student.test <- t.test(subset(cars, am == 0 )$mpg, subset(cars, am == 1 )$mpg)
 ```
 
-So, with a confidence of 95% we reject the previous hypothesis, since the $ p - $ - value of the test is less than 0.05, in fact it is `r student.test$p.value ` and the means are `r student.test$estimate` for the groups 
+So, with a confidence of 95% we reject the previous hypothesis, since the _p-_ value of the test is less than 0.05, in fact it is `r student.test$p.value ` and the means are `r student.test$estimate` for the groups 
   automatic and manual respectively, so we proceed to fit a multiple regression model which relates mpg to the other features. 
 
 
-Although nine other features are available as possible regressors some of them have high correlation between them and natural relations 
+In view of the fact that automobiles have a higher performance of miles per gallon of gasoline, _mpg_ , when they have the manual transmission, 
+we will try to predict performance depending on the other variables for which information is available.
 
-**relaciones naturales como por ejemplo _____citar ejemplos de dependencia entre variables______ proporcionan evidencia para no considderar a las variables: XXX  dentro del estudio 
-como puede verse en la figura 1**
-
+As the variable _mpg_ has a high linear correlation with the other variables, as can be seen in figure 2,
+ a first proposed multiple linear model contemplates all variables, considering _cyl_ and _am_ as categorical, The confidence intervals for each of the parameters (in this saturated model) are as follows:
+ 
 
 ```{r }
+model.Saturate <- lm(mpg ~ ., data = cars)
+kable(confint(model.Saturate))
+```
+
+
+
+Since no interval, with 95% confidence, does not go through zero, we proceed to discard from the model the variables that present less [Akaike](https://en.wikipedia.org/wiki/Akaike_information_criterion) information, and the new model estimade  has three parameters, $\alpha_{wt}$, $\alpha_{qsec}$  and $\alpha_{am1}$ whose confidence intervals do not pass through zero, and their values are significant because the three values of the parameters pass the test $T$ of significance ($p-value$<$0.05$) the constant term is decided to include to maintain a referent when the other variables are zero.:
+
+
+
+```{r baseline}
+model.Baseline <- step(model.Saturate, trace = FALSE)
+library(pander)
+panderOptions("digits", 2)
+pander(summary(model.Baseline))
 
 ```
+
+## Conclusion
+
+To diagnose the robustness of the model, the non-correlation of the residuals with our variables features and _mpg_ was verified (both are small below to .4, see figure 3 ), also a Kolmogorov-Smirnov test was performed on the residues to contrast the hypothesis that the residues follow a normal distribution (see table 2).
+
+
+*In conclusion with the adjusted model, because the coefficient with the variable _am1_ which refers to the manual automobile transimision (due to encoding of factor type used) has a value of 9.6 we can say that if the other variables are left fixed An automobile will have an average of 9.6 miles per gallon higher than cars that do not have manual transmission, this estimate in the difference between the original means is due in part to the information provided by the variables _wt_ and _qsec_ to the model and both are Part of two different components as mentioned in the legend of figure 2.*
+
+
+
 
 ## Adjuncts
 ```{r pressure}
@@ -69,3 +130,53 @@ kable(summary(cars))
 ```
 
 Table 1: Descriptive statistics of the variables. Note 
+
+
+
+```{r correlations}
+
+cars2 <- mtcars
+library(ggcorrplot)
+r <- cor(mtcars)
+ggcorrplot(cor(mtcars),, title = "Correlations between 11 initial variables",
+           colors = c("deeppink", "white", "deepskyblue"),  type = "lower",
+           outline.col = "white")
+```
+
+
+
+Figure [2]: Correlation between the variables of the data set, note that the
+ variable _wt_ is positively correlated with _hp_, _disp_, _cyl_ and _carb_ 
+ which reflect directly the weight of the car, this same set of variables 
+ $ \ {wt, hp, Disp. , Cyl, carb\}$ negatively correlate with the _mpg_ variable 
+ while the other variables correlate positively with respect to _mpg_.
+
+```{r corre}
+library(RColorBrewer)
+r <- data.frame(res = model.Baseline$residuals, mpg = cars$mpg, qsec= cars$qsec)
+r1 <- round(cor(r$res, r$mpg), 2)
+r2 <- round(cor(r$res, r$qsec), 2) 
+g1 <- ggplot(r, aes(res, mpg)) + geom_point(aes(
+    colour = rep(brewer.pal(8, "Set2"),4))) + xlab('residuals') + ylab('mpg') +
+    theme_bw() +  ggtitle('Residuals vs mpg') + #xlim(c(0,20))+
+    theme(legend.position = "none")
+g2 <- ggplot(r, aes(res, qsec)) + geom_point(aes(
+    colour = rep(brewer.pal(8, "Set2"),4))) + xlab('residuals') + ylab('qsec') +
+    theme_bw() +  ggtitle('Residuals vs qsec') + #xlim(c(0,20))+
+    theme(legend.position = "none")
+multiplot(g1, g2, cols = 2)
+```
+
+
+Figure 3: Correlation of the residuals with the variable to be predicted _mpg_ (right: correlation = `r r1`).
+ Correlation of residues with the variable _qsec_ (left: correlation = `r r2`)
+
+
+
+```{r ks}
+meanks <-  round(mean(model.Baseline$residuals), 2)
+sdks <- round(sd(model.Baseline$residuals), 2)
+pander(ks.test(model.Baseline$residuals, "pnorm", meanks, sdks))
+```
+
+Table 2: Kolmogorov-Smirnov test on the residuals of the model with three parameters. The proof that residuals is distributed as a normal with average `r meanks` (another important assuption ) and `r sdks` sd is accepted.
