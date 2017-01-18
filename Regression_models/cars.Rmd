@@ -2,9 +2,9 @@
 title: 'Motor trend: automatic or manual transmission?'
 author: "José Antonio García Ramirez"
 date: "January 10, 2017"
-output: pdf_document 
-
-
+output: 
+  md_document:
+  variant: markdown_github
 ---
 
 ```{r setup, include=FALSE}
@@ -40,7 +40,7 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL)
 
 ## Summary
 
-With the data available from our Motor Trend magazine, the question of whether the performance of cars is improved by using manual or automatic transmission is assessed. First, a test of means is evaluated, indicating that the difference is non notorious, then a generalized linear model is used, showing again the difference between the use of transmissions and the effect of the choice against the performance of miles per gallon
+With the data available from our Motor Trend magazine, the question of whether the performance of cars is improved by using manual or automatic transmission is assessed. First, a test of means is evaluated, indicating that the difference is notorious, then a multiple linear model is used, showing again the difference between the use of transmissions and the effect of the choice against the performance of miles per gallon
 
 
 ## Data
@@ -79,10 +79,12 @@ For this reason, we performed a Student t test (since we know neither the varian
   * $H_0$  The performance of automobiles (mpg) with automatic transmission is on average equal to the average performance of cars with manual transmission
 
 ```{r }
-student.test <- t.test(subset(cars, am == 0 )$mpg, subset(cars, am == 1 )$mpg)
+automatic <- subset(cars, am == 0, select = mpg )
+manual <- subset(cars, am == 1, select = mpg )
+student.test <- t.test(automatic, manual)
 ```
 
-So, with a confidence of 95% we **non reject** the previous hypothesis, since the _p-_ value of the test is less than 0.05, in fact it is `r student.test$p.value ` and the means are `r student.test$estimate` for the groups 
+So, with a confidence of 95% we ** reject** the previous hypothesis, since the _p-_ value of the test is less than 0.05, in fact it is `r student.test$p.value ` and the means are `r student.test$estimate` for the groups 
   automatic and manual respectively, so we proceed to fit a multiple regression model which relates mpg to the other features. 
 
 
