@@ -1,0 +1,85 @@
+---
+title: "Practical ML"
+author: "José Antonio García Ramirez"
+date: "January 19, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+
+
+
+## Get the Data 
+
+Since the Train and Test sets are defined in this [exercise](https://www.coursera.org/learn/practical-machine-learning/peer/R43St/prediction-assignment-writeup), we will not say anything about the bias that can contain the sample that forms the Train set but we are going to use the one-leave-out method to train the models since the final part of the exercise consists of predicting 20 observations.
+
+
+```{r getdata}
+Train <- read.csv('https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv')
+Test <- read.csv('https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv')
+```
+
+## Preprocess and pruning
+Then we get the datasets, directly from the web addresses, and then we notice that many of the variables containing both datasets present a considerable amount of NA and we remove those variables with little information
+
+```{r removeNA}
+library(ggplot2)
+library(RColorBrewer)
+NApercentage <- function(column)
+{
+	return(mean(is.na(column)))
+}
+listNA <- apply(Train, 2, NApercentage)
+listNA
+```
+
+It is decided to eliminate those variables where more than 50% of their contents are NA, and after a manual revision (with the summary function), the "read.csv" function identifies the character "# DIV / 0!" In some columns what originated that those that contain it are read as factors instead of being numerical, all of them also are little informative because they contain a large percentage of NA, also these variables were discarded including variables with temporal information.
+
+```{r removeNA2}
+removeVar <- listNA[listNA > .5] 
+Vars <- setdiff(colnames(Train), names(removeVar))
+#summary(Train[,Vars])
+```
+
+
+
+```{r removeNA3}
+removeDIV <- c("X", "raw_timestamp_part_1", "raw_timestamp_part_2",
+			   "cvtd_timestamp", "kurtosis_roll_belt", "kurtosis_picth_belt",
+			   "kurtosis_yaw_belt", "skewness_roll_belt", "skewness_roll_belt.1",
+			   "skewness_yaw_belt", "max_yaw_belt", "min_yaw_belt",
+			   "amplitude_yaw_belt", "kurtosis_roll_arm", "kurtosis_picth_arm",
+			   "kurtosis_yaw_arm", "skewness_roll_arm", "skewness_pitch_arm",
+			   "skewness_yaw_arm", "kurtosis_roll_dumbbell",
+			   "kurtosis_picth_dumbbell", "kurtosis_yaw_dumbbell", 
+			   "skewness_roll_dumbbell", "skewness_pitch_dumbbell",
+			   "skewness_yaw_dumbbell", "max_yaw_dumbbell", 
+			   "min_yaw_dumbbell", "amplitude_yaw_dumbbell",
+			   "kurtosis_roll_forearm", "kurtosis_picth_forearm",
+			   "kurtosis_yaw_forearm", "skewness_roll_forearm",
+			   "skewness_pitch_forearm", "skewness_yaw_forearm",
+			   "max_yaw_forearm", "min_yaw_forearm", "amplitude_yaw_forearm")
+Vars <- setdiff(Vars, removeDIV)			   
+```
+
+At this point in the Train dataset set there are no NA values so no pruning is required
+```{r naomit}
+sum(is.na(Train[,Vars]))
+```
+
+## Models selection
+
+Given that 55 features are available, some of which are numeric and other factors, to predict one of type factor, variable _classe_,  we are faced with a classification problem rather than a regression problem.
+
+Given that the content of most of the available variables is uncertain, three algorithms will be used that are not sensitive to transformations of the variables( incluying centering and scaling):
+
+  * LDA and QDA
+  * Random forest
+  * Naive Bayes
+  
+  
+  
+  
