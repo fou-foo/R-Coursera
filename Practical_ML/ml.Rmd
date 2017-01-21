@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 
 ## Get the Data 
 
-Since the Train and Test sets are defined in this [exercise](https://www.coursera.org/learn/practical-machine-learning/peer/R43St/prediction-assignment-writeup), we will not say anything about the bias that can contain the sample that forms the Train set but even though in an ideal case, with enough computer equipment, we would like to use the one-leave-out method to train the models, since the final part of the exercise consists of predicting 20 observations, due to run-time issues. It was decided to use the 10-times validation, which is faster than one-leave-out validation and also presents less risk in overtraining the models with the Trainset.
+Since the Train and Test sets are defined in this [exercise](https://www.coursera.org/learn/practical-machine-learning/peer/R43St/prediction-assignment-writeup), we will not say anything about the bias that can contain the sample that forms the Train set but even though in an ideal case, with enough computer equipment, we would like to use the one-leave-out method to train the models, since the final part of the exercise consists of predicting 20 observations, due to run-time issues. It was decided to use only the 10-fold cross validation, which is faster than one-leave-out validation and also presents less risk in overtraining the models with the Trainset.
 
 
 ```{r getdata}
@@ -96,7 +96,7 @@ So, we train the models, first the QDA. A LDA model was also trained but its acc
 
 ```{r QDA }
 library(caret)
-controlTrain <- trainControl(method = "cv", number = 2, allowParallel = TRUE)
+controlTrain <- trainControl(method = "cv", number = 10, allowParallel = TRUE) #indicating 10-fold
 QDA <- train(classe~. , data = Train[, Vars], method = "qda",
 			 trControl = controlTrain)
 QDAClases <- predict(QDA, newdata = Train[, Vars])

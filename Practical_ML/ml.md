@@ -8,9 +8,9 @@ forms the Train set but even though in an ideal case, with enough
 computer equipment, we would like to use the one-leave-out method to
 train the models, since the final part of the exercise consists of
 predicting 20 observations, due to run-time issues. It was decided to
-use the 10-times validation, which is faster than one-leave-out
-validation and also presents less risk in overtraining the models with
-the Trainset.
+use only the 10-fold cross validation, which is faster than
+one-leave-out validation and also presents less risk in overtraining the
+models with the Trainset.
 
     Train <- read.csv('https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv')
     Test <- read.csv('https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv')
@@ -235,15 +235,9 @@ So, we train the models, first the QDA. A LDA model was also trained but
 its accuracy is approximately 0.77 and for it was discarded.
 
     library(caret)
-
-    ## Loading required package: lattice
-
-    controlTrain <- trainControl(method = "cv", number = 2, allowParallel = TRUE)
+    controlTrain <- trainControl(method = "cv", number = 10, allowParallel = TRUE) #indicating 10-fold
     QDA <- train(classe~. , data = Train[, Vars], method = "qda",
                  trControl = controlTrain)
-
-    ## Loading required package: MASS
-
     QDAClases <- predict(QDA, newdata = Train[, Vars])
     confusionMatrix(QDAClases, Train$classe)
 
