@@ -1,3 +1,10 @@
 base
 ggplot2
 RColorBrewer
+lattice
+caret
+pander
+MASS
+randomForest
+kernlab
+knitr

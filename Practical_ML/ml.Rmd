@@ -2,7 +2,9 @@
 title: "Practical ML"
 author: "José Antonio García Ramirez"
 date: "January 19, 2017"
-output: html_document
+output: 
+  md_document:
+  variant: markdown_github
 ---
 
 ```{r setup, include=FALSE}
@@ -14,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 
 ## Get the Data 
 
-Since the Train and Test sets are defined in this [exercise](https://www.coursera.org/learn/practical-machine-learning/peer/R43St/prediction-assignment-writeup), we will not say anything about the bias that can contain the sample that forms the Train set but we are going to use the one-leave-out method to train the models since the final part of the exercise consists of predicting 20 observations.
+Since the Train and Test sets are defined in this [exercise](https://www.coursera.org/learn/practical-machine-learning/peer/R43St/prediction-assignment-writeup), we will not say anything about the bias that can contain the sample that forms the Train set but even though in an ideal case, with enough computer equipment, we would like to use the one-leave-out method to train the models, since the final part of the exercise consists of predicting 20 observations, due to run-time issues. It was decided to use the 10-times validation, which is faster than one-leave-out validation and also presents less risk in overtraining the models with the Trainset.
 
 
 ```{r getdata}
@@ -27,7 +29,6 @@ Then we get the datasets, directly from the web addresses, and then we notice th
 
 ```{r removeNA}
 library(ggplot2)
-library(RColorBrewer)
 NApercentage <- function(column)
 {
 	return(mean(is.na(column)))
@@ -65,10 +66,21 @@ removeDIV <- c("X", "raw_timestamp_part_1", "raw_timestamp_part_2",
 Vars <- setdiff(Vars, removeDIV)			   
 ```
 
-At this point in the Train dataset set there are no NA values so no pruning is required
+At this point in the Train dataset set there are no NA values so no pruning is required. 
+
 ```{r naomit}
 sum(is.na(Train[,Vars]))
+``` 
+
+It is important to note the distribution of the classes in our dataset, as you can see in table 1, class 'A' has approximately 28% of the cases, this induces a lower bound on the performance of the classification algorithms that we will try.
+
+```{r firstaprox}
+library(pander)
+a <- table(Train$classe)/ dim(Train)[1]
+pander(round(a, 2))
 ```
+Table 1: _classe_'s distribution, target variable, in the training dataset.  
+
 
 ## Models selection
 
@@ -76,10 +88,62 @@ Given that 55 features are available, some of which are numeric and other factor
 
 Given that the content of most of the available variables is uncertain, three algorithms will be used that are not sensitive to transformations of the variables( incluying centering and scaling):
 
-  * LDA and QDA
+  * Quadratic discriminant analysis (QDA)
   * Random forest
-  * Naive Bayes
+  * Support vector machine (SVM)
+
+So, we train the models, first the QDA. A LDA model was also trained but its accuracy is approximately 0.77 and for it was discarded.
+
+```{r QDA }
+library(caret)
+controlTrain <- trainControl(method = "cv", number = 2, allowParallel = TRUE)
+QDA <- train(classe~. , data = Train[, Vars], method = "qda",
+			 trControl = controlTrain)
+QDAClases <- predict(QDA, newdata = Train[, Vars])
+confusionMatrix(QDAClases, Train$classe)
+```
   
+
+
+Surprisingly, the SVM algorithm has less accuracy than the QDA
+
+```{r SV}
+SV <- train(classe ~ ., data = Train[, Vars], method = "svmLinear",
+			trControl = controlTrain )
+SVClases <- predict(SV, newdata = Train[, Vars])
+confusionMatrix(SVClases, Train$classe)
+```
+
+
+And even more surprisingly Random Forest classifies phenomenally.
   
-  
-  
+```{r RF}
+RF <- train(classe ~ ., data = Train[, Vars], method = "rf",
+			trControl = controlTrain)
+RFClases <- predict(RF, newdata = Train[, Vars])
+confusionMatrix(RFClases, Train$classe)
+```
+
+In view of the above, the fabulous performance of RF, it is decided to use the predictions of the SVM and QDA models and then give them as inputs to RandomForest, not to overtrain. The assembled model trained on the Train data set is as follows:
+
+```{r rffinal}
+dataTrain <- data.frame(SVM = SVClases, QDA = QDAClases, classe = Train$classe )
+RF.finalTrain  <- train(classe ~ ., data = dataTrain, method = "rf")
+RF.final <- predict(RF.finalTrain, newdata = dataTrain) 
+confusionMatrix(RF.final, Train$classe)
+```
+
+So the predictions for the 20 different test cases are the following:
+
+```{r future}
+library(knitr)
+test.SV <- predict(SV, Test)
+test.QDA <- predict(QDA, Test)
+test.final <- data.frame(SVM = test.SV, QDA = test.QDA,
+						 id = Test$problem_id)
+test.final$Output <- predict(RF.finalTrain, test.final)
+kable(test.final[,c("id", "Output")])
+```
+
+
+

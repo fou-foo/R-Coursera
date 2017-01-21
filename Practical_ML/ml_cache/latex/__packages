@@ -1,0 +1,9 @@
+base
+ggplot2
+pander
+lattice
+caret
+MASS
+kernlab
+randomForest
+knitr
