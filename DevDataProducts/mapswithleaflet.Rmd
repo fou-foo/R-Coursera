@@ -6,6 +6,7 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+setwd('/home/fou/Desktop/Online/RCoursera/R-Coursera/DevDataProducts/')
 ```
 
 ## Previous work and context
@@ -16,7 +17,7 @@ Part of the selection process consisted in solving a problem with data. The cont
 In the prelude to Hurricane [Patricia](https://en.wikipedia.org/wiki/Hurricane_Patricia) in [Nayarit](https://en.wikipedia.org/wiki/Nayarit), a data set  was collected about information of community centers (which serve as an emergency shelter incluying it's spatial location) distributed throughout the entity, data are provided by the institution that made the contest but are available in my [git](https://github.com/fou-foo/DataLab/blob/master/datalab.md) along with the analysis I made (the document is in Spanish), **it's required that anyone can see which community centers are closest to their location.**
 An important point of the competition was the visualization of the results, in that time the best visualization that I could did was the following:
 
-![First map for k cluster](/home/fou/Desktop/Online/RCoursera/R-Coursera/DevDataProducts/mapaviejo1.png)
+![First map for k cluster](mapaviejo1.png)
 
 
 
