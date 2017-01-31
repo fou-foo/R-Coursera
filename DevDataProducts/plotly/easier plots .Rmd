@@ -1,0 +1,45 @@
+---
+title: "Easier reactive plots "
+author: "José Antonio García Ramirez"
+date: "January 30, 2017"
+output:
+  ioslides_presentation: default
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache =TRUE)
+```
+
+## Previous work and context
+
+A few weeks ago I made the following [visualization](https://foufoo.shinyapps.io/plotly/) using the packages _shiny_ and _ggvis_ at the time they were the only tools (in R) that I knew to present a reactive graph  which it to put the mouse over the data points displays aditional data (in this case an average value and a maximum value at each point).
+
+```{r plotly, echo = FALSE, include = FALSE, warnings = FALSE}
+library(plotly)
+library(dplyr)
+load('/home/fou/Desktop/Online/RCoursera/R-Coursera/DevDataProducts/plotly/stats.Rdata')
+p <- plot_ly(
+  stats2, x = ~dinero, y = ~n,
+  color = ~factor(periodo), size = ~media) %>%
+	layout(title = "Cost vs number of beneficiaries",
+           xaxis = list(title = "Total amount"), 
+           yaxis = list(title = "Max. Number of procedures"))
+
+```
+
+## 
+The same plot is repeated using _plotly_ with the same data. 
+
+```{r, warning= FALSE, message=  FALSE}
+p
+```
+
+
+
+
+## Conclutions and further work
+
+Today for the graph made with _ggvis_ I have not found a way to share the image so that the functionality of displaying information by putting the mouse over the points is maintained, I have only managed to share the image as .png, however when using _plotly_ the development time was much, much, less a web service is not required and I was able to share the graph keeping the said functionality in a .html file :D
+```
+
