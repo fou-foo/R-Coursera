@@ -56,4 +56,5 @@ forceNetwork(Links = aristas, Nodes = nodos,
 			 )
 
 library(rsconnect)
-rsconnect::deployApp('')
+rsconnect::deployApp('/home/fou/Desktop/Online/RCoursera/R-Coursera/DevDataProducts/ShinyGraph/appGrafo',
+					 account ="foufoo")

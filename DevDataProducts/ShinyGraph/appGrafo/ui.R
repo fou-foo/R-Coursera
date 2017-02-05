@@ -1,3 +1,5 @@
+library(shiny)
+library(networkD3)
 ui <- shinyUI(fluidPage(
 	titlePanel("EcoBici (Shared bicycles in Mexico) "),
 	
@@ -24,7 +26,7 @@ ui <- shinyUI(fluidPage(
 						 		h6("Finally an option to draw different colors of the nodes is given at the user's choice."),
 						 		h6("Also on the graph you can zoom to see it better.")
 						 ),
-				tabPanel("Force Network", forceNetworkOutput("force"))
+				tabPanel("Network", forceNetworkOutput("force"))
 			)
 		)
 	)
