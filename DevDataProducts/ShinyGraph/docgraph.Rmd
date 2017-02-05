@@ -1,0 +1,80 @@
+---
+title: "EcoBici (Shared bicycles in Mexico)"
+author: "José Antonio García Ramirez"
+date: "February 5, 2017"
+output:
+  ioslides_presentation: default
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache =TRUE)
+```
+
+## Previous work and context
+In Mexico City there is a bicycle loan system, [EcoBici](https://www.ecobici.cdmx.gob.mx/), and A few months ago I do a study about them about which stations are the most popular and which routes (travel from station to station) are more used, you can consult the study [here](https://github.com/fou-foo/opi_test/blob/master/exa_opi.html) (But only available in Spanish but add a nice map made with _leaflet_). 
+
+##  Updates to the previous work
+When the study was carried out, a graph was needed to explore the flows between the stations.
+The _shiny_ app is documented as follows:
+
+   * The second tab shows a display of stations of a bicycle loan service in Mexico City, each node represents a station in the city.
+   * The edges represent very popular travel routes, on the left side you can choose the threshold from which routes are drawn in which $ n > 50$ travels arrive and you can also draw the routes in which they leave more than $ m > 50 $ trips per service station.
+   * The service API also provides information about the inflow of the stations, that information is what determines in node size.
+   * Finally an option to draw different colors of the nodes is given at the user's choice.
+   * Also on the graph you can zoom to see it better.
+
+## Example output App
+
+```{r grafo}
+library(shiny)
+library(networkD3)
+setwd("/home/fou/Desktop/Online/RCoursera/R-Coursera/DevDataProducts/ShinyGraph")
+load(file= "oct.Rdata")
+library(dplyr)
+flujo_neg <- oct %>% select(Ciclo_Estacion_Retiro, Ciclo_Estacion_Arribo) %>%
+		arrange(Ciclo_Estacion_Retiro, Ciclo_Estacion_Arribo) %>%
+		group_by(Ciclo_Estacion_Retiro) %>% summarise(w = n()) #viajes que salen de estacion
+flujo_neg$tipo <- "Salida" 
+names(flujo_neg) <- c('Estacion',"wins", "tipo")
+flujo_pos <- oct %>% select(Ciclo_Estacion_Retiro, Ciclo_Estacion_Arribo) %>%
+		arrange( Ciclo_Estacion_Arribo, Ciclo_Estacion_Retiro) %>%
+		group_by(Ciclo_Estacion_Arribo) %>% summarise(dentro = n()) %>% arrange(desc(dentro))
+flujo_pos$tipo <- "Entrada"
+names(flujo_pos) <- c('Estacion',"w","tipo")
+edges_in <- oct %>% select(Ciclo_Estacion_Retiro, Ciclo_Estacion_Arribo) %>%
+			group_by(Ciclo_Estacion_Retiro, Ciclo_Estacion_Arribo) %>% summarise(w = n()) %>%
+			arrange(desc(w))
+ins <- subset(edges_in, w > 200)
+edges_out <- oct %>% select( Ciclo_Estacion_Arribo, Ciclo_Estacion_Retiro) %>%
+	group_by( Ciclo_Estacion_Arribo, Ciclo_Estacion_Retiro) %>% summarise(w = n()) %>%
+	arrange(desc(w))
+out <- subset(edges_out, w > 200)
+aristas <- rbind(ins, out)
+aristas <- as.data.frame(aristas)
+nodos <- as.data.frame(flujo_pos)
+names(aristas) <- c("source", "target", "value" )
+names(nodos) <- c("id", "w", "tipo")
+aristas$source <- aristas$source - 1
+aristas$target <- aristas$target - 1
+nodos$id <- nodos$id -1 
+aristas$value <- scale(aristas$value, scale = FALSE)
+forceNetwork(Links = aristas, Nodes = nodos,
+					 Source = 'source', Target = 'target',
+					 Value = "value", opacity = 0.8,
+					 NodeID = 'id', Group = "w",
+					 radiusCalculation = "Math.pow(Math.log(d.nodesize), 1.5)",
+					 Nodesize  = "w", 
+					 zoom = TRUE
+					 #legend = TRUE
+		)
+```
+
+
+
+
+## Conclutions and further work
+
+Today for the graph made with _ggvis_ I have not found a way to share the image so that the functionality of displaying information by putting the mouse over the points is maintained, I have only managed to share the image as .png, however when using _plotly_ the development time was much, much, less a web service is not required and I was able to share the graph keeping the said functionality in a .html file :D
+
+

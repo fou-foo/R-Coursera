@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = FALSE, cache =TRUE)
 
 ## Previous work and context
 
-A few weeks ago I made the following [visualization](https://foufoo.shinyapps.io/plotly/) using the packages _shiny_ and _ggvis_ at the time they were the only tools (in R) that I knew to present a reactive graph  which it to put the mouse over the data points displays aditional data (in this case an average value and a maximum value at each point).
+A few weeks ago I made the following [visualization](https://foufoo.shinyapps.io/app1/) using the packages _shiny_ and _ggvis_ at the time they were the only tools (in R) that I knew to present a reactive graph  which it to put the mouse over the data points displays aditional data (in this case an average value and a maximum value at each point).
 
 ```{r plotly, echo = FALSE, include = FALSE, warnings = FALSE}
 library(plotly)

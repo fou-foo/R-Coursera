@@ -1,0 +1,10 @@
+name: ShinyGraph
+title: ShinyGraph
+account: foufoo
+server: shinyapps.io
+appId: 154992
+bundleId: 701066
+url: https://foufoo.shinyapps.io/ShinyGraph/
+when: 1486276803.74921
+asMultiple: FALSE
+asStatic: FALSE
