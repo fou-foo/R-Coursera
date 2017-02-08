@@ -75,6 +75,9 @@ forceNetwork(Links = aristas, Nodes = nodos,
 
 ## Conclutions and further work
 
-Today for the graph made with _ggvis_ I have not found a way to share the image so that the functionality of displaying information by putting the mouse over the points is maintained, I have only managed to share the image as .png, however when using _plotly_ the development time was much, much, less a web service is not required and I was able to share the graph keeping the said functionality in a .html file :D
+[app](https://foufoo.shinyapps.io/appgrafo/)
 
-
+  * Search in the _graph_
+  * Custom _graph_ maybe with _igraph_ package
+  * Deploy own visualization in R
+  * Change language ...
