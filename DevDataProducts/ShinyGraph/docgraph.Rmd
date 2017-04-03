@@ -81,3 +81,11 @@ forceNetwork(Links = aristas, Nodes = nodos,
   * Custom _graph_ maybe with _igraph_ package
   * Deploy own visualization in R
   * Change language ...
+  
+  #doc 
+library(shiny)
+options(shiny.port = 8080)
+
+
+runApp("d:\\Users\\GARA903U\\Desktop\\1.5\\Shiny", 
+       host = getOption("shiny.host", "99.95.107.246"))
