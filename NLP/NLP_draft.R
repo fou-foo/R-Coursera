@@ -98,8 +98,11 @@ str(cloud2)
 
 
 Corpus.steam <- tm_map(Corpus.stem, stemDocument)
-M.Stem <- dfm(Corpus.maps) 
-save(M.sinStem, file = 'C:\\Users\\fou-f\\Desktop\\final\\matrices\\matriz_Q_DFM_stem.Rdata')
+Corpus.steam <- corpus(Corpus.steam)
+rm("Corpus.stem")
+gc()
+M.Stem <- dfm(Corpus.steam) 
+save(M.Stem, file = 'C:\\Users\\fou-f\\Desktop\\final\\matrices\\matriz_Q_DFM_stem.Rdata')
 suma <- sum(apply(M.Stem, 1, sum)) #suma de todos los terminos
 word.freq.stem <- apply(M.Stem, 2, sum)
 Words.freq.stem <- data.frame(freq = word.freq.stem)
@@ -111,23 +114,33 @@ head(Words.freq2.stem)
 Words.freq2.stem$f.rel <- Words.freq2.stem$freq / suma
 Words.freq2.stem$f.acum <- cumsum(Words.freq2.stem$f.rel)
 Words.freq2.stem$word <- row.names(Words.freq2.stem)
-perc.50 <- subset(Words.freq2stem, f.acum <= .5)
+perc.50.stem <- subset(Words.freq2.stem, f.acum <= .5)
 library(ggplot2)
 #distribuion de las palabras 
-ggplot(perc.50) +geom_bar( aes(x = word, weight = freq ), position = position_stack(reverse = TRUE))
-perc.90 <- subset(Words.freq2, f.acum <= .9)
-cloud <- subset(Words.freq2, f.acum <= .5)
+ggplot(perc.50.stem) +geom_bar( aes(x = word, weight = freq ), position = position_stack(reverse = TRUE))
+perc.90 <- subset(Words.freq2.stem, f.acum <= .9)
+cloud.stem <- subset(Words.freq2.stem, f.acum <= .5)
 library(wordcloud2)
-cloud$f.rel <- NULL
-cloud$f.acum <- NULL
-cloud$word <- factor(cloud$word)
-cloud2 <- cloud
-cloud2$freq <- NULL
-cloud2$freq <- cloud$freq
-wordcloud2(data = cloud2)
-str(demoFreq)
-str(cloud2)
+cloud.stem$f.rel <- NULL
+cloud.stem$f.acum <- NULL
+cloud.stem$word <- factor(cloud.stem$word)
+cloud2.stem <- cloud.stem
+cloud2.stem$freq <- NULL
+cloud2.stem$freq <- cloud.stem$freq
+wordcloud2(data = cloud2.stem)
 
+
+
+#decidimos ir por el stem 
+
+distri <- subset(Words.freq2.stem, f.acum <= .1)
+library(ggplot2)
+ggplot(data = distri, aes(x = factor(word), y = freq, fill = freq)) +
+  geom_bar(stat="identity") +   # se construyen las barras
+  scale_fill_distiller(palette = 'Accent')+ # la magia de poder escoger facíl el color de la escala 'continua' o discreta
+  xlab('cambiando color por escala') + theme_minimal() +  ggtitle('Gráfica colorida')+  #demas cosas
+  guides(fill=FALSE) + #quitar leyenda 
+  coord_flip()
 
 
 
