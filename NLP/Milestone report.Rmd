@@ -1,0 +1,74 @@
+---
+title: "NLP Task"
+author: "José Antonio García Ramirez"
+date: "October 8, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+# Input 
+
+
+```{r}
+library(stringr)                              # to easy handle strings 
+library(tm)                                   # to read easy folders of documents 
+#devtools::install_github("kbenoit/quanteda") # install 'quanteda' run more quick than 'tm' working with text 
+library(quanteda)                             # text analysis written in C languaje
+setwd("C:\\Users\\fou-f\\Desktop\\final\\en_US")
+Corpus <- VCorpus(DirSource(getwd(), encoding = "UTF-8"), readerControl = list(language = "en"))
+
+#n <- length(Corpus[[3]]$content)       #el mas largo de los strings
+#max(mapply(function(x){
+ #   nchar(Corpus[[3]]$content[x])  
+  #  }, 1:n))
+#n <- length(Corpus[[3]]$content)
+#sum(unlist(mapply(function(x){
+ #  grep("love", Corpus[[3]]$content[x])  
+ # }, 1:n)))/sum(unlist(mapply(function(x){
+  #    grep("hate", Corpus[[3]]$content[x])  
+ # }, 1:n)))
+#Corpus[[3]]$content[grep("biostats", Corpus[[3]]$content)]
+#Corpus[[3]]$content[grep("A computer once beat me at chess, but it was no match for me at kickboxing",  Corpus[[3]]$content)]
+t <- Sys.time()
+Corpus.maps <- tm_map(Corpus, stripWhitespace)                     #quitamos espacios en blanco y simbolos
+Corpus.maps <- tm_map(Corpus, removePunctuation)
+Corpus.maps <- tm_map(Corpus, removeNumbers)
+encoding <- function(x) iconv(x, "latin1", "ASCII", sub="")
+f <- content_transformer(function(x, pattern) gsub(pattern, "", x))
+Corpus.maps <- tm_map(Corpus.maps, content_transformer(encoding))
+Corpus.maps <- tm_map(Corpus.maps, f, "[!\"#$%&'*+,./)(:;<=>?@][^`{|}~]")
+Corpus.maps <- tm_map(Corpus.maps, content_transformer(tolower))                     #todo a minusculas
+Corpus.maps <- tm_map(Corpus.maps, removeWords, stopwords("english"))   #stopwords
+(t <- Sys.time() - t)
+Corpus.maps <- tm_map(Corpus.maps, content_transformer(tolower))
+Corpus.steam <- tm_map(Corpus.maps, stemDocument)
+rm(list="Corpus")
+gc()
+save.image(file = 'C:\\Users\\fou-f\\Desktop\\final\\rSessionNLP.Rdata')
+
+```
+
+
+Vamos a ver si el 'stem' sirve en el documento primero obtengamos los resultados con todo el Corpus y luego vamos a hacer lo mismo con el Corpus con 'stem'
+
+```{r}
+
+
+load('C:\\Users\\fou-f\\Desktop\\final\\rSessionNLP.Rdata')
+library(quanteda)
+library(tm)
+rm(Corpus.steam)
+gc()
+Corpus.maps <- corpus(Corpus.maps)
+t1 <- Sys.time()
+M.sinStem <- dfm(Corpus.maps) 
+#save(M.sinStem, file = 'C:\\Users\\fou-f\\Desktop\\final\\matrices\\matriz_Q_DFM.Rdata')
+t1 <- Sys.time() - t1 #se tarda 7.1 minutos
+
+```
+
+
+
